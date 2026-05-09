@@ -38,7 +38,7 @@ st.markdown(
 
     h1 {
         text-align: center;
-        color: #FF6F91;
+        color: #2F3142;
         font-size: 48px;
         font-weight: 800;
     }
@@ -50,7 +50,7 @@ st.markdown(
     .stButton > button {
         width: 100%;
         height: 68px;
-        font-size: 26px;
+        font-size: 24px;
         font-weight: bold;
         border-radius: 25px;
         background-color: #FFCE54;
@@ -96,38 +96,62 @@ st.markdown(
         text-align: center;
     }
 
+    .step-box {
+        background-color: #E8F8F5;
+        padding: 14px;
+        border-radius: 16px;
+        border: 2px solid #55E6C1;
+        font-size: 18px;
+        color: #2C3A47;
+        text-align: center;
+        margin-top: 18px;
+        margin-bottom: 18px;
+    }
+
+    .next-box {
+        background-color: #FFF7E6;
+        padding: 18px;
+        border-radius: 18px;
+        border: 3px solid #F7D794;
+        font-size: 18px;
+        color: #2C3A47;
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 15px;
+    }
+
     .dog-left {
         position: fixed;
-        left: 15px;
-        top: 120px;
-        width: 150px;
+        left: 25px;
+        top: 150px;
+        width: 130px;
         opacity: 0.95;
         z-index: 1;
     }
 
     .dog-right {
         position: fixed;
-        right: 15px;
-        top: 120px;
-        width: 150px;
+        right: 25px;
+        top: 150px;
+        width: 130px;
         opacity: 0.95;
         z-index: 1;
     }
 
     .paw-left {
         position: fixed;
-        left: 45px;
+        left: 48px;
         bottom: 40px;
-        font-size: 34px;
+        font-size: 32px;
         line-height: 1.8;
         z-index: 1;
     }
 
     .paw-right {
         position: fixed;
-        right: 45px;
+        right: 48px;
         bottom: 40px;
-        font-size: 34px;
+        font-size: 32px;
         line-height: 1.8;
         z-index: 1;
     }
@@ -310,18 +334,86 @@ def generate_audio(story, audio_generator):
 
     return audio_array, sample_rate
 
-# Run the main Streamlit app.
-def main():
+# Save generated results in session state.
+def save_results(caption, story, audio_array, sample_rate):
+    st.session_state["caption"] = caption
+    st.session_state["story"] = story
+    st.session_state["audio_array"] = audio_array
+    st.session_state["sample_rate"] = sample_rate
+    st.session_state["has_result"] = True
+
+# Clear generated results from session state.
+def clear_results():
+    st.session_state["caption"] = ""
+    st.session_state["story"] = ""
+    st.session_state["audio_array"] = None
+    st.session_state["sample_rate"] = None
+    st.session_state["has_result"] = False
+
+# Generate caption, story, and audio.
+def create_story_and_audio(image):
+    with st.spinner("Loading AI models... 🧠✨"):
+        captioning_model = load_captioning_model()
+        audio_generator = load_audio_generator()
+
+    with st.spinner("Reading the picture... 👀📷"):
+        caption = generate_caption(image, captioning_model)
+
+    with st.spinner("Generating a short story... 📖✨"):
+        story = generate_story_from_caption(caption)
+
+    with st.spinner("Generating audio data... 🔊🎵"):
+        audio_array, sample_rate = generate_audio(story, audio_generator)
+
+    save_results(caption, story, audio_array, sample_rate)
+
+# Display generated caption, story, and audio.
+def display_results():
+    st.markdown("### 🖼️ What I See in Your Picture")
     st.markdown(
-        """
-        <div class="top-line">
-        📚 📷 📖 ✨ 🔊
+        f"""
+        <div class="caption-box">
+        {st.session_state["caption"]}
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.title("Turn Your Text into an Audio Story")
+    st.write("")
+
+    st.markdown("### 📖 Your Magical Story")
+    st.markdown(
+        f"""
+        <div class="story-box">
+        {st.session_state["story"]}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.write("")
+
+    st.markdown("### 🔊 Listen to Your Story")
+    st.audio(
+        st.session_state["audio_array"],
+        sample_rate=st.session_state["sample_rate"]
+    )
+
+# Run the main Streamlit app.
+def main():
+    if "has_result" not in st.session_state:
+        clear_results()
+
+    st.markdown(
+        """
+        <div class="top-line">
+        📷 📖 🔊
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.title("Turn Your Picture into an Audio Story")
 
     st.markdown(
         """
@@ -334,14 +426,22 @@ def main():
         unsafe_allow_html=True
     )
 
-    st.write("")
+    st.markdown(
+        """
+        <div class="step-box">
+        1️⃣ Upload a picture → 2️⃣ Create a story → 3️⃣ Listen to audio
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     uploaded_file = st.file_uploader(
-        "📷 Upload a picture for your story:",
+        "Upload a picture for your story:",
         type=["jpg", "jpeg", "png"]
     )
 
     if uploaded_file is None:
+        clear_results()
         st.info("Please upload a picture first. Your story will appear here after the image is uploaded. ✨")
         return
 
@@ -360,63 +460,54 @@ def main():
 
     if st.button("✨ Generate Story and Audio ✨"):
         try:
-            with st.spinner("Loading AI models... 🧠✨"):
-                captioning_model = load_captioning_model()
-                audio_generator = load_audio_generator()
-
-            with st.spinner("Reading the picture... 👀📷"):
-                caption = generate_caption(image, captioning_model)
-
-            st.markdown("### 🖼️ Image Description")
-            st.markdown(
-                f"""
-                <div class="caption-box">
-                {caption}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-            st.write("")
-
-            with st.spinner("Generating a short story... 📖✨"):
-                story = generate_story_from_caption(caption)
-
-            st.markdown("### 📖 Your Story")
-            st.markdown(
-                f"""
-                <div class="story-box">
-                {story}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-            st.write("")
-
-            with st.spinner("Generating audio data... 🔊🎵"):
-                audio_array, sample_rate = generate_audio(story, audio_generator)
-
-            st.markdown("### 🔊 Listen to Your Story")
-            st.audio(audio_array, sample_rate=sample_rate)
-
+            create_story_and_audio(image)
             st.success("Story and audio generated successfully! 🌟")
-
-            st.markdown(
-                """
-                <div class="footer-line">
-                📚 📷 ✨ 📖 🔊 ✨ 📷 📚
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
         except Exception as error:
             st.error("Something went wrong while creating the story or audio. 😢")
             st.warning("Please try another image or click the button again.")
 
             with st.expander("Show error details for debugging"):
                 st.write(error)
+
+    if st.session_state["has_result"]:
+        display_results()
+
+        st.markdown(
+            """
+            <div class="next-box">
+            What would you like to do next?
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            if st.button("🔄 Make Another Story"):
+                try:
+                    create_story_and_audio(image)
+                    st.success("A new story has been created! 🌟")
+                    st.rerun()
+                except Exception as error:
+                    st.error("Something went wrong while making another story. 😢")
+
+                    with st.expander("Show error details for debugging"):
+                        st.write(error)
+
+        with col2:
+            if st.button("🖼️ Choose a New Picture"):
+                clear_results()
+                st.info("Please click the small X beside the uploaded file, then upload a new picture.")
+
+        st.markdown(
+            """
+            <div class="footer-line">
+            📷 ✨ 📖 🔊 ✨ 📷
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 # Start the app.
 if __name__ == "__main__":
