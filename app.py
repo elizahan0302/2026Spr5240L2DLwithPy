@@ -6,7 +6,7 @@ import random
 # Set up the Streamlit page.
 st.set_page_config(
     page_title="Text to Audio Story",
-    page_icon="📚",
+    page_icon="✨",
     layout="wide"
 )
 
@@ -359,7 +359,7 @@ def clear_results():
 
 # Generate caption, story, and audio.
 def create_story_and_audio(image):
-    with st.spinner("Loading AI models... 🧠✨"):
+    with st.spinner("Loading AI models... 🪄✨"):
         captioning_model = load_captioning_model()
         audio_generator = load_audio_generator()
 
