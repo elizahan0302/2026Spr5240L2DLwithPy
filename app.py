@@ -12,11 +12,30 @@ st.set_page_config(
     layout="wide"
 )
 
+DOG_SVG = """
+<svg viewBox="0 0 200 200">
+    <path d="M55 95 C35 80, 35 45, 65 42 C75 20, 115 20, 125 42 C155 45, 160 80, 140 95" 
+          fill="#FFF7E6" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+    <path d="M63 45 C48 50, 43 68, 50 85" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+    <path d="M125 45 C145 50, 150 70, 140 88" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="78" cy="78" r="6" fill="#333333"/>
+    <circle cx="118" cy="78" r="6" fill="#333333"/>
+    <path d="M93 95 Q100 102 107 95" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+    <path d="M100 88 L100 100" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="100" cy="88" r="6" fill="#333333"/>
+    <path d="M72 120 C65 150, 135 150, 128 120" fill="#FFF7E6" stroke="#333333" stroke-width="5"/>
+    <path d="M75 145 L70 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+    <path d="M125 145 L130 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+    <path d="M65 170 L78 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+    <path d="M122 170 L135 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+</svg>
+"""
+
 # Add child-friendly CSS styles.
 st.markdown(
-    """
+    f"""
     <style>
-    .stApp {
+    .stApp {{
         background: linear-gradient(
             90deg,
             #FFF1F6 0%,
@@ -26,9 +45,9 @@ st.markdown(
             #FFF7FB 88%,
             #FFF1F6 100%
         );
-    }
+    }}
 
-    .block-container {
+    .block-container {{
         max-width: 950px;
         padding-top: 2rem;
         padding-bottom: 3rem;
@@ -36,20 +55,20 @@ st.markdown(
         border-radius: 30px;
         margin-top: 20px;
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-    }
+    }}
 
-    h1 {
+    h1 {{
         text-align: center;
         color: #2F3142;
         font-size: 48px;
         font-weight: 800;
-    }
+    }}
 
-    h2, h3 {
+    h2, h3 {{
         color: #4B7BEC;
-    }
+    }}
 
-    .stButton > button {
+    .stButton > button {{
         width: 100%;
         height: 68px;
         font-size: 24px;
@@ -59,16 +78,16 @@ st.markdown(
         color: #333333;
         border: 4px solid #F6B93B;
         box-shadow: 0 5px 0 #D99B24;
-    }
+    }}
 
-    .stButton > button:hover {
+    .stButton > button:hover {{
         background-color: #FFD966;
         color: #000000;
         border: 4px solid #E58E26;
         transform: scale(1.01);
-    }
+    }}
 
-    .story-box {
+    .story-box {{
         background-color: #E8F8F5;
         padding: 24px;
         border-radius: 24px;
@@ -76,18 +95,18 @@ st.markdown(
         font-size: 22px;
         line-height: 1.7;
         color: #2C3A47;
-    }
+    }}
 
-    .caption-box {
+    .caption-box {{
         background-color: #FDEBD0;
         padding: 18px;
         border-radius: 18px;
         border: 3px solid #F5B041;
         font-size: 19px;
         color: #2C3A47;
-    }
+    }}
 
-    .tip-box {
+    .tip-box {{
         background-color: #FCE4EC;
         padding: 20px;
         border-radius: 22px;
@@ -96,9 +115,9 @@ st.markdown(
         color: #2C3A47;
         line-height: 1.7;
         text-align: center;
-    }
+    }}
 
-    .step-box {
+    .step-box {{
         background-color: #E8F8F5;
         padding: 14px;
         border-radius: 16px;
@@ -108,9 +127,9 @@ st.markdown(
         text-align: center;
         margin-top: 18px;
         margin-bottom: 18px;
-    }
+    }}
 
-    .next-box {
+    .next-box {{
         background-color: #FFF7E6;
         padding: 18px;
         border-radius: 18px;
@@ -120,119 +139,71 @@ st.markdown(
         text-align: center;
         margin-top: 20px;
         margin-bottom: 18px;
-    }
+    }}
 
-    .dog-left {
+    .dog-left, .dog-right {{
         position: fixed;
+        top: 150px;
+        width: 130px;
+        opacity: 0.95;
+        z-index: 1;
+    }}
+
+    .dog-left {{
         left: 25px;
-        top: 150px;
-        width: 130px;
-        opacity: 0.95;
-        z-index: 1;
-    }
+    }}
 
-    .dog-right {
-        position: fixed;
+    .dog-right {{
         right: 25px;
-        top: 150px;
-        width: 130px;
-        opacity: 0.95;
-        z-index: 1;
-    }
+    }}
 
-    .paw-left {
+    .paw-left, .paw-right {{
         position: fixed;
+        bottom: 40px;
+        font-size: 32px;
+        line-height: 1.8;
+        z-index: 1;
+    }}
+
+    .paw-left {{
         left: 48px;
-        bottom: 40px;
-        font-size: 32px;
-        line-height: 1.8;
-        z-index: 1;
-    }
+    }}
 
-    .paw-right {
-        position: fixed;
+    .paw-right {{
         right: 48px;
-        bottom: 40px;
-        font-size: 32px;
-        line-height: 1.8;
-        z-index: 1;
-    }
+    }}
 
-    .top-line {
+    .top-line, .footer-line {{
         text-align: center;
         font-size: 30px;
         margin-bottom: 8px;
-    }
+    }}
 
-    .footer-line {
-        text-align: center;
+    .footer-line {{
         font-size: 28px;
         margin-top: 25px;
-    }
+    }}
 
-    @media screen and (max-width: 1000px) {
-        .dog-left, .dog-right, .paw-left, .paw-right {
+    @media screen and (max-width: 1000px) {{
+        .dog-left, .dog-right, .paw-left, .paw-right {{
             display: none;
-        }
+        }}
 
-        .block-container {
+        .block-container {{
             margin-top: 0px;
             border-radius: 18px;
-        }
+        }}
 
-        h1 {
+        h1 {{
             font-size: 36px;
-        }
-    }
+        }}
+    }}
     </style>
 
-    <div class="dog-left">
-        <svg viewBox="0 0 200 200">
-            <path d="M55 95 C35 80, 35 45, 65 42 C75 20, 115 20, 125 42 C155 45, 160 80, 140 95" 
-                  fill="#FFF7E6" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M63 45 C48 50, 43 68, 50 85" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M125 45 C145 50, 150 70, 140 88" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <circle cx="78" cy="78" r="6" fill="#333333"/>
-            <circle cx="118" cy="78" r="6" fill="#333333"/>
-            <path d="M93 95 Q100 102 107 95" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M100 88 L100 100" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <circle cx="100" cy="88" r="6" fill="#333333"/>
-            <path d="M72 120 C65 150, 135 150, 128 120" fill="#FFF7E6" stroke="#333333" stroke-width="5"/>
-            <path d="M75 145 L70 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M125 145 L130 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M65 170 L78 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M122 170 L135 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M133 128 Q165 118 158 95" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-        </svg>
-    </div>
-
-    <div class="dog-right">
-        <svg viewBox="0 0 200 200">
-            <path d="M55 95 C35 80, 35 45, 65 42 C75 20, 115 20, 125 42 C155 45, 160 80, 140 95" 
-                  fill="#FFF7E6" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M63 45 C48 50, 43 68, 50 85" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M125 45 C145 50, 150 70, 140 88" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <circle cx="78" cy="78" r="6" fill="#333333"/>
-            <circle cx="118" cy="78" r="6" fill="#333333"/>
-            <path d="M93 95 Q100 102 107 95" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M100 88 L100 100" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <circle cx="100" cy="88" r="6" fill="#333333"/>
-            <path d="M72 120 C65 150, 135 150, 128 120" fill="#FFF7E6" stroke="#333333" stroke-width="5"/>
-            <path d="M75 145 L70 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M125 145 L130 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M65 170 L78 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M122 170 L135 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <path d="M67 128 Q35 118 42 95" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-        </svg>
-    </div>
-
-    <div class="paw-left">
-        🐾<br>🐾<br>🐾
-    </div>
-
-    <div class="paw-right">
-        🐾<br>🐾<br>🐾
-    </div>
+    <div class="dog-left">{DOG_SVG}</div>
+    <div class="dog-right">{DOG_SVG}</div>
+    <div class="paw-left">🐾<br>🐾<br>🐾</div>
+    <div class="paw-right">🐾<br>🐾<br>🐾</div>
     """,
     unsafe_allow_html=True
 )
@@ -253,11 +224,10 @@ def load_audio_generator():
         model="Matthijs/mms-tts-eng"
     )
 
-# Open and check the uploaded image.
+# Open and validate the uploaded image.
 def open_uploaded_image(uploaded_file):
     try:
-        image = Image.open(uploaded_file)
-        return image.convert("RGB")
+        return Image.open(uploaded_file).convert("RGB")
     except Exception:
         st.error("Oops! 😢 This file does not look like a valid image. Please upload a JPG or PNG picture.")
         return None
@@ -268,65 +238,49 @@ def generate_caption(image, captioning_model):
 
     if result and isinstance(result, list):
         caption = result[0].get("generated_text", "").strip()
-        if caption:
-            return caption
+        return caption or "a lovely scene"
 
     return "a lovely scene"
 
-# Capitalize the caption for display only.
-def caption_for_display(caption):
-    if not caption:
-        return "A lovely scene"
+# Format the caption for display or story text.
+def format_caption(caption, capitalize=False):
+    caption = (caption or "a lovely scene").strip()
+    first_letter = caption[0].upper() if capitalize else caption[0].lower()
+    return first_letter + caption[1:]
 
-    caption = caption.strip()
-    return caption[0].upper() + caption[1:]
-
-# Keep the caption lowercase when it appears after a comma.
-def caption_after_comma(caption):
-    if not caption:
-        return "a lovely scene"
-
-    caption = caption.strip()
-    return caption[0].lower() + caption[1:]
-
-# Create a story that stays related to the image caption.
+# Create a story based on the image caption.
 def generate_story_from_caption(caption):
-    scene = caption_after_comma(caption)
+    scene = format_caption(caption, capitalize=False)
 
-    openings = [
+    opening = random.choice([
         "One sunny morning",
         "On a bright and cheerful day",
         "Once upon a time",
         "One peaceful afternoon"
-    ]
+    ])
 
-    actions = [
+    action = random.choice([
         "something special began to happen",
         "a tiny surprise appeared nearby",
         "a gentle adventure quietly began",
         "a happy little moment started to grow"
-    ]
+    ])
 
-    helpers = [
+    helper = random.choice([
         "a kind friend came along to help",
         "a cheerful helper joined the adventure",
         "a friendly voice said, 'Let's explore together'",
         "a new friend arrived with a big smile"
-    ]
+    ])
 
-    lessons = [
+    lesson = random.choice([
         "kindness can make every day brighter",
         "small adventures can become wonderful memories",
         "curiosity can lead to happy discoveries",
         "sharing joy can make everyone smile"
-    ]
+    ])
 
-    opening = random.choice(openings)
-    action = random.choice(actions)
-    helper = random.choice(helpers)
-    lesson = random.choice(lessons)
-
-    story = (
+    return (
         f"{opening}, {scene} became the start of a magical adventure. "
         f"Soon, {action}. "
         f"Then {helper}, and they explored the world with brave hearts and happy smiles. "
@@ -334,78 +288,82 @@ def generate_story_from_caption(caption):
         "They returned home feeling proud, safe, and full of joy."
     )
 
-    return story
-
 # Split the story into sentences for clearer audio pauses.
 def split_story_into_sentences(story):
-    sentences = re.split(r'(?<=[.!?])\\s+', story.strip())
-    return [sentence.strip() for sentence in sentences if sentence.strip()]
+    return [
+        sentence.strip()
+        for sentence in re.split(r'(?<=[.!?])\s+', story.strip())
+        if sentence.strip()
+    ]
 
 # Create silence with the same shape as the audio.
 def create_silence_like_audio(audio_array, sample_rate, seconds=0.85):
     silence_length = int(sample_rate * seconds)
 
     if audio_array.ndim == 1:
-        silence = np.zeros(silence_length, dtype=audio_array.dtype)
+        return np.zeros(silence_length, dtype=audio_array.dtype)
 
-    elif audio_array.ndim == 2:
-        if audio_array.shape[0] <= audio_array.shape[1]:
-            silence = np.zeros((audio_array.shape[0], silence_length), dtype=audio_array.dtype)
-        else:
-            silence = np.zeros((silence_length, audio_array.shape[1]), dtype=audio_array.dtype)
+    if audio_array.ndim == 2 and audio_array.shape[0] <= audio_array.shape[1]:
+        return np.zeros((audio_array.shape[0], silence_length), dtype=audio_array.dtype)
 
-    else:
-        audio_array = audio_array.reshape(-1)
-        silence = np.zeros(silence_length, dtype=audio_array.dtype)
+    if audio_array.ndim == 2:
+        return np.zeros((silence_length, audio_array.shape[1]), dtype=audio_array.dtype)
 
-    return silence
+    return np.zeros(silence_length, dtype=np.float32)
 
 # Convert the story into audio with clearer pauses.
 def generate_audio(story, audio_generator):
-    sentences = split_story_into_sentences(story)
     audio_parts = []
     sample_rate = None
 
-    for sentence in sentences:
+    for sentence in split_story_into_sentences(story):
         speech_output = audio_generator(sentence)
         audio_array = np.asarray(speech_output["audio"])
         sample_rate = speech_output["sampling_rate"]
 
         audio_parts.append(audio_array)
-
-        silence = create_silence_like_audio(
-            audio_array=audio_array,
-            sample_rate=sample_rate,
-            seconds=0.85
-        )
-
-        audio_parts.append(silence)
+        audio_parts.append(create_silence_like_audio(audio_array, sample_rate))
 
     first_audio = audio_parts[0]
+    axis = 1 if first_audio.ndim == 2 and first_audio.shape[0] <= first_audio.shape[1] else 0
 
-    if first_audio.ndim == 2 and first_audio.shape[0] <= first_audio.shape[1]:
-        full_audio = np.concatenate(audio_parts, axis=1)
-    else:
-        full_audio = np.concatenate(audio_parts, axis=0)
+    return np.concatenate(audio_parts, axis=axis), sample_rate
 
-    return full_audio, sample_rate
+# Initialize session state.
+def initialize_state():
+    defaults = {
+        "caption": "",
+        "story": "",
+        "audio_array": None,
+        "sample_rate": None,
+        "has_result": False,
+        "is_generating": False
+    }
 
-# Save generated results in session state.
-def save_results(caption, story, audio_array, sample_rate):
-    st.session_state["caption"] = caption
-    st.session_state["story"] = story
-    st.session_state["audio_array"] = audio_array
-    st.session_state["sample_rate"] = sample_rate
-    st.session_state["has_result"] = True
+    for key, value in defaults.items():
+        st.session_state.setdefault(key, value)
 
 # Clear generated results from session state.
 def clear_results():
-    st.session_state["caption"] = ""
-    st.session_state["story"] = ""
-    st.session_state["audio_array"] = None
-    st.session_state["sample_rate"] = None
-    st.session_state["has_result"] = False
-    st.session_state["is_generating"] = False
+    st.session_state.update({
+        "caption": "",
+        "story": "",
+        "audio_array": None,
+        "sample_rate": None,
+        "has_result": False,
+        "is_generating": False
+    })
+
+# Save generated results in session state.
+def save_results(caption, story, audio_array, sample_rate):
+    st.session_state.update({
+        "caption": caption,
+        "story": story,
+        "audio_array": audio_array,
+        "sample_rate": sample_rate,
+        "has_result": True,
+        "is_generating": False
+    })
 
 # Generate caption, story, and audio.
 def create_story_and_audio(image):
@@ -425,7 +383,6 @@ def create_story_and_audio(image):
         audio_array, sample_rate = generate_audio(story, audio_generator)
 
     save_results(caption, story, audio_array, sample_rate)
-    st.session_state["is_generating"] = False
 
 # Display generated caption, story, and audio.
 def display_results():
@@ -433,13 +390,11 @@ def display_results():
     st.markdown(
         f"""
         <div class="caption-box">
-        {caption_for_display(st.session_state["caption"])}
+        {format_caption(st.session_state["caption"], capitalize=True)}
         </div>
         """,
         unsafe_allow_html=True
     )
-
-    st.write("")
 
     st.markdown("### 📖 Your Magical Story")
     st.markdown(
@@ -451,8 +406,6 @@ def display_results():
         unsafe_allow_html=True
     )
 
-    st.write("")
-
     st.markdown("### 🔊 Listen to Your Story")
     st.audio(
         st.session_state["audio_array"],
@@ -461,21 +414,9 @@ def display_results():
 
 # Run the main Streamlit app.
 def main():
-    if "has_result" not in st.session_state:
-        clear_results()
+    initialize_state()
 
-    if "is_generating" not in st.session_state:
-        st.session_state["is_generating"] = False
-
-    st.markdown(
-        """
-        <div class="top-line">
-        📷 📖 🔊
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
+    st.markdown('<div class="top-line">📷 📖 🔊</div>', unsafe_allow_html=True)
     st.title("Turn Your Picture into an Audio Story")
 
     st.markdown(
@@ -513,13 +454,7 @@ def main():
     if image is None:
         return
 
-    st.image(
-        image,
-        caption="Uploaded picture 🖼️",
-        use_container_width=True
-    )
-
-    st.write("")
+    st.image(image, caption="Uploaded picture 🖼️", use_container_width=True)
 
     if st.button("✨ Make My Story! ✨"):
         try:
@@ -538,20 +473,15 @@ def main():
 
         if not st.session_state["is_generating"]:
             st.markdown(
-                """
-                <div class="next-box">
-                What would you like to do next?
-                </div>
-                """,
+                '<div class="next-box">What would you like to do next?</div>',
                 unsafe_allow_html=True
             )
 
-            col1, spacer, col2 = st.columns([1, 0.25, 1], gap="large")
+            col1, col2 = st.columns(2, gap="large")
 
             with col1:
                 if st.button("🔄 Tell Me Another Story!"):
                     try:
-                        st.session_state["is_generating"] = True
                         create_story_and_audio(image)
                         st.success("A new story is ready! 🌟")
                         st.rerun()
@@ -568,11 +498,7 @@ def main():
                     st.info("Please click the small X beside the uploaded file, then upload a new image.")
 
             st.markdown(
-                """
-                <div class="footer-line">
-                📷 ✨ 📖 🔊 ✨ 📷
-                </div>
-                """,
+                '<div class="footer-line">📷 ✨ 📖 🔊 ✨ 📷</div>',
                 unsafe_allow_html=True
             )
 
