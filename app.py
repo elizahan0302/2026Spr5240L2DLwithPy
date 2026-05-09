@@ -277,6 +277,7 @@ def generate_caption(image, captioning_model):
 def caption_for_display(caption):
     if not caption:
         return "A lovely scene"
+
     caption = caption.strip()
     return caption[0].upper() + caption[1:]
 
@@ -284,6 +285,7 @@ def caption_for_display(caption):
 def caption_after_comma(caption):
     if not caption:
         return "a lovely scene"
+
     caption = caption.strip()
     return caption[0].lower() + caption[1:]
 
@@ -339,10 +341,24 @@ def split_story_into_sentences(story):
     sentences = re.split(r'(?<=[.!?])\\s+', story.strip())
     return [sentence.strip() for sentence in sentences if sentence.strip()]
 
-# Create silence between audio sentences.
-def create_silence(sample_rate, seconds=0.85, dtype=np.float32):
+# Create silence with the same shape as the audio.
+def create_silence_like_audio(audio_array, sample_rate, seconds=0.85):
     silence_length = int(sample_rate * seconds)
-    return np.zeros(silence_length, dtype=dtype)
+
+    if audio_array.ndim == 1:
+        silence = np.zeros(silence_length, dtype=audio_array.dtype)
+
+    elif audio_array.ndim == 2:
+        if audio_array.shape[0] <= audio_array.shape[1]:
+            silence = np.zeros((audio_array.shape[0], silence_length), dtype=audio_array.dtype)
+        else:
+            silence = np.zeros((silence_length, audio_array.shape[1]), dtype=audio_array.dtype)
+
+    else:
+        audio_array = audio_array.reshape(-1)
+        silence = np.zeros(silence_length, dtype=audio_array.dtype)
+
+    return silence
 
 # Convert the story into audio with clearer pauses.
 def generate_audio(story, audio_generator):
@@ -357,14 +373,20 @@ def generate_audio(story, audio_generator):
 
         audio_parts.append(audio_array)
 
-        silence = create_silence(
+        silence = create_silence_like_audio(
+            audio_array=audio_array,
             sample_rate=sample_rate,
-            seconds=0.85,
-            dtype=audio_array.dtype
+            seconds=0.85
         )
+
         audio_parts.append(silence)
 
-    full_audio = np.concatenate(audio_parts)
+    first_audio = audio_parts[0]
+
+    if first_audio.ndim == 2 and first_audio.shape[0] <= first_audio.shape[1]:
+        full_audio = np.concatenate(audio_parts, axis=1)
+    else:
+        full_audio = np.concatenate(audio_parts, axis=0)
 
     return full_audio, sample_rate
 
