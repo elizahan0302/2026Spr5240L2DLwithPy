@@ -2,11 +2,13 @@ import streamlit as st
 from PIL import Image
 from transformers import pipeline
 import random
+import re
+import numpy as np
 
 # Set up the Streamlit page.
 st.set_page_config(
     page_title="Text to Audio Story",
-    page_icon="✨",
+    page_icon="🌟",
     layout="wide"
 )
 
@@ -271,15 +273,23 @@ def generate_caption(image, captioning_model):
 
     return "a lovely scene"
 
-# Capitalize the first letter of the caption.
-def capitalize_caption(caption):
+# Capitalize the caption for display only.
+def caption_for_display(caption):
     if not caption:
         return "A lovely scene"
+    caption = caption.strip()
     return caption[0].upper() + caption[1:]
+
+# Keep the caption lowercase when it appears after a comma.
+def caption_after_comma(caption):
+    if not caption:
+        return "a lovely scene"
+    caption = caption.strip()
+    return caption[0].lower() + caption[1:]
 
 # Create a story that stays related to the image caption.
 def generate_story_from_caption(caption):
-    scene = capitalize_caption(caption)
+    scene = caption_after_comma(caption)
 
     openings = [
         "One sunny morning",
@@ -324,22 +334,39 @@ def generate_story_from_caption(caption):
 
     return story
 
-# Add short pauses after sentence endings.
-def add_pauses_to_text(story):
-    paused_story = story.replace(". ", ". ... ")
-    paused_story = paused_story.replace("! ", "! ... ")
-    paused_story = paused_story.replace("? ", "? ... ")
-    return paused_story
+# Split the story into sentences for clearer audio pauses.
+def split_story_into_sentences(story):
+    sentences = re.split(r'(?<=[.!?])\\s+', story.strip())
+    return [sentence.strip() for sentence in sentences if sentence.strip()]
 
-# Convert the story into audio.
+# Create silence between audio sentences.
+def create_silence(sample_rate, seconds=0.85, dtype=np.float32):
+    silence_length = int(sample_rate * seconds)
+    return np.zeros(silence_length, dtype=dtype)
+
+# Convert the story into audio with clearer pauses.
 def generate_audio(story, audio_generator):
-    story_with_pauses = add_pauses_to_text(story)
-    speech_output = audio_generator(story_with_pauses)
+    sentences = split_story_into_sentences(story)
+    audio_parts = []
+    sample_rate = None
 
-    audio_array = speech_output["audio"]
-    sample_rate = speech_output["sampling_rate"]
+    for sentence in sentences:
+        speech_output = audio_generator(sentence)
+        audio_array = np.asarray(speech_output["audio"])
+        sample_rate = speech_output["sampling_rate"]
 
-    return audio_array, sample_rate
+        audio_parts.append(audio_array)
+
+        silence = create_silence(
+            sample_rate=sample_rate,
+            seconds=0.85,
+            dtype=audio_array.dtype
+        )
+        audio_parts.append(silence)
+
+    full_audio = np.concatenate(audio_parts)
+
+    return full_audio, sample_rate
 
 # Save generated results in session state.
 def save_results(caption, story, audio_array, sample_rate):
@@ -356,10 +383,13 @@ def clear_results():
     st.session_state["audio_array"] = None
     st.session_state["sample_rate"] = None
     st.session_state["has_result"] = False
+    st.session_state["is_generating"] = False
 
 # Generate caption, story, and audio.
 def create_story_and_audio(image):
-    with st.spinner("Loading AI models... 🪄✨"):
+    st.session_state["is_generating"] = True
+
+    with st.spinner("Loading magic tools... 🪄✨"):
         captioning_model = load_captioning_model()
         audio_generator = load_audio_generator()
 
@@ -373,6 +403,7 @@ def create_story_and_audio(image):
         audio_array, sample_rate = generate_audio(story, audio_generator)
 
     save_results(caption, story, audio_array, sample_rate)
+    st.session_state["is_generating"] = False
 
 # Display generated caption, story, and audio.
 def display_results():
@@ -380,7 +411,7 @@ def display_results():
     st.markdown(
         f"""
         <div class="caption-box">
-        {st.session_state["caption"]}
+        {caption_for_display(st.session_state["caption"])}
         </div>
         """,
         unsafe_allow_html=True
@@ -411,6 +442,9 @@ def main():
     if "has_result" not in st.session_state:
         clear_results()
 
+    if "is_generating" not in st.session_state:
+        st.session_state["is_generating"] = False
+
     st.markdown(
         """
         <div class="top-line">
@@ -420,7 +454,7 @@ def main():
         unsafe_allow_html=True
     )
 
-    st.title("Turn Your Picture into an Audio Story")
+    st.title("🌈 Turn Your Picture into an Audio Story")
 
     st.markdown(
         """
@@ -470,6 +504,7 @@ def main():
             create_story_and_audio(image)
             st.success("Your story and audio are ready! 🌟")
         except Exception as error:
+            st.session_state["is_generating"] = False
             st.error("Something went wrong while making the story or audio. 😢")
             st.warning("Please try another image or click the button again.")
 
@@ -479,42 +514,45 @@ def main():
     if st.session_state["has_result"]:
         display_results()
 
-        st.markdown(
-            """
-            <div class="next-box">
-            What would you like to do next?
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        if not st.session_state["is_generating"]:
+            st.markdown(
+                """
+                <div class="next-box">
+                What would you like to do next?
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
-        col1, col2 = st.columns([1, 1], gap="large")
+            col1, spacer, col2 = st.columns([1, 0.25, 1], gap="large")
 
-        with col1:
-            if st.button("🔄 Tell Me Another Story!"):
-                try:
-                    create_story_and_audio(image)
-                    st.success("A new story is ready! 🌟")
-                    st.rerun()
-                except Exception as error:
-                    st.error("Something went wrong while making another story. 😢")
+            with col1:
+                if st.button("🔄 Tell Me Another Story!"):
+                    try:
+                        st.session_state["is_generating"] = True
+                        create_story_and_audio(image)
+                        st.success("A new story is ready! 🌟")
+                        st.rerun()
+                    except Exception as error:
+                        st.session_state["is_generating"] = False
+                        st.error("Something went wrong while making another story. 😢")
 
-                    with st.expander("Show error details for debugging"):
-                        st.write(error)
+                        with st.expander("Show error details for debugging"):
+                            st.write(error)
 
-        with col2:
-            if st.button("🖼️ Try a New Image!"):
-                clear_results()
-                st.info("Please click the small X beside the uploaded file, then upload a new image.")
+            with col2:
+                if st.button("🖼️ Try a New Image!"):
+                    clear_results()
+                    st.info("Please click the small X beside the uploaded file, then upload a new image.")
 
-        st.markdown(
-            """
-            <div class="footer-line">
-            📷 ✨ 📖 🔊 ✨ 📷
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+            st.markdown(
+                """
+                <div class="footer-line">
+                📷 ✨ 📖 🔊 ✨ 📷
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
 # Start the app.
 if __name__ == "__main__":
