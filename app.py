@@ -113,11 +113,11 @@ st.markdown(
         padding: 18px;
         border-radius: 18px;
         border: 3px solid #F7D794;
-        font-size: 18px;
+        font-size: 20px;
         color: #2C3A47;
         text-align: center;
         margin-top: 20px;
-        margin-bottom: 15px;
+        margin-bottom: 18px;
     }
 
     .dog-left {
@@ -269,10 +269,18 @@ def generate_caption(image, captioning_model):
         if caption:
             return caption
 
-    return "a lovely picture"
+    return "a lovely scene"
+
+# Capitalize the first letter of the caption.
+def capitalize_caption(caption):
+    if not caption:
+        return "A lovely scene"
+    return caption[0].upper() + caption[1:]
 
 # Create a story that stays related to the image caption.
 def generate_story_from_caption(caption):
+    scene = capitalize_caption(caption)
+
     openings = [
         "One sunny morning",
         "On a bright and cheerful day",
@@ -280,39 +288,38 @@ def generate_story_from_caption(caption):
         "One peaceful afternoon"
     ]
 
-    feelings = [
-        "felt curious and excited",
-        "was ready for a small adventure",
-        "wanted to explore the world nearby",
-        "felt happy, brave, and kind"
+    actions = [
+        "something special began to happen",
+        "a tiny surprise appeared nearby",
+        "a gentle adventure quietly began",
+        "a happy little moment started to grow"
     ]
 
-    actions = [
-        "looked around carefully and found something special",
-        "took a small step forward and smiled",
-        "noticed a tiny surprise nearby",
-        "shared the happy moment with a new friend"
+    helpers = [
+        "a kind friend came along to help",
+        "a cheerful helper joined the adventure",
+        "a friendly voice said, 'Let's explore together'",
+        "a new friend arrived with a big smile"
     ]
 
     lessons = [
-        "being kind makes every day brighter",
+        "kindness can make every day brighter",
         "small adventures can become wonderful memories",
         "curiosity can lead to happy discoveries",
-        "sharing joy makes everyone smile"
+        "sharing joy can make everyone smile"
     ]
 
     opening = random.choice(openings)
-    feeling = random.choice(feelings)
     action = random.choice(actions)
+    helper = random.choice(helpers)
     lesson = random.choice(lessons)
 
     story = (
-        f"{opening}, the picture showed {caption}. "
-        f"It {feeling}. "
-        f"It {action}. "
-        "Along the way, a gentle friend came to help, and together they turned the moment into a magical adventure. "
+        f"{opening}, {scene} became the start of a magical adventure. "
+        f"Soon, {action}. "
+        f"Then {helper}, and they explored the world with brave hearts and happy smiles. "
         f"By the end of the day, everyone learned that {lesson}. "
-        "They went home smiling, feeling proud, safe, and happy."
+        "They returned home feeling proud, safe, and full of joy."
     )
 
     return story
@@ -356,13 +363,13 @@ def create_story_and_audio(image):
         captioning_model = load_captioning_model()
         audio_generator = load_audio_generator()
 
-    with st.spinner("Reading the picture... 👀📷"):
+    with st.spinner("Reading the image... 👀📷"):
         caption = generate_caption(image, captioning_model)
 
-    with st.spinner("Generating a short story... 📖✨"):
+    with st.spinner("Making your story... 📖✨"):
         story = generate_story_from_caption(caption)
 
-    with st.spinner("Generating audio data... 🔊🎵"):
+    with st.spinner("Making the audio... 🔊🎵"):
         audio_array, sample_rate = generate_audio(story, audio_generator)
 
     save_results(caption, story, audio_array, sample_rate)
@@ -429,7 +436,7 @@ def main():
     st.markdown(
         """
         <div class="step-box">
-        1️⃣ Upload a picture → 2️⃣ Create a story → 3️⃣ Listen to audio
+        1️⃣ Upload a picture → 2️⃣ Make a story → 3️⃣ Listen and enjoy
         </div>
         """,
         unsafe_allow_html=True
@@ -458,12 +465,12 @@ def main():
 
     st.write("")
 
-    if st.button("✨ Generate Story and Audio ✨"):
+    if st.button("✨ Make My Story! ✨"):
         try:
             create_story_and_audio(image)
-            st.success("Story and audio generated successfully! 🌟")
+            st.success("Your story and audio are ready! 🌟")
         except Exception as error:
-            st.error("Something went wrong while creating the story or audio. 😢")
+            st.error("Something went wrong while making the story or audio. 😢")
             st.warning("Please try another image or click the button again.")
 
             with st.expander("Show error details for debugging"):
@@ -481,13 +488,13 @@ def main():
             unsafe_allow_html=True
         )
 
-        col1, col2 = st.columns(2)
+        col1, col2 = st.columns([1, 1], gap="large")
 
         with col1:
-            if st.button("🔄 Make Another Story"):
+            if st.button("🔄 Tell Me Another Story!"):
                 try:
                     create_story_and_audio(image)
-                    st.success("A new story has been created! 🌟")
+                    st.success("A new story is ready! 🌟")
                     st.rerun()
                 except Exception as error:
                     st.error("Something went wrong while making another story. 😢")
@@ -496,9 +503,9 @@ def main():
                         st.write(error)
 
         with col2:
-            if st.button("🖼️ Choose a New Picture"):
+            if st.button("🖼️ Try a New Image!"):
                 clear_results()
-                st.info("Please click the small X beside the uploaded file, then upload a new picture.")
+                st.info("Please click the small X beside the uploaded file, then upload a new image.")
 
         st.markdown(
             """
