@@ -13,7 +13,7 @@ st.set_page_config(
 )
 
 DOG_SVG = """
-<svg viewBox="0 0 200 200">
+<svg width="100%" height="100%" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet">
     <path d="M55 95 C35 80, 35 45, 65 42 C75 20, 115 20, 125 42 C155 45, 160 80, 140 95" 
           fill="#FFF7E6" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
     <path d="M63 45 C48 50, 43 68, 50 85" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
@@ -145,8 +145,21 @@ st.markdown(
         position: fixed;
         top: 150px;
         width: 130px;
+        height: 130px;
+        max-width: 130px;
+        max-height: 130px;
         opacity: 0.95;
         z-index: 1;
+        overflow: hidden;
+        pointer-events: none;
+    }}
+
+    .dog-left svg, .dog-right svg {{
+        width: 130px !important;
+        height: 130px !important;
+        max-width: 130px !important;
+        max-height: 130px !important;
+        display: block;
     }}
 
     .dog-left {{
@@ -163,6 +176,7 @@ st.markdown(
         font-size: 32px;
         line-height: 1.8;
         z-index: 1;
+        pointer-events: none;
     }}
 
     .paw-left {{
