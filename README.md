@@ -65,8 +65,8 @@ storytelling_app/
 │
 ├── app.py
 ├── requirements.txt
-└── README.md
-```
+├── README.md
+└── LICENSE
 
 ### File Description
 
@@ -158,6 +158,13 @@ The app includes error handling for common problems, such as:
 - Audio generation errors
 
 If an error occurs, the app shows a friendly message to the user and provides debugging details for development purposes.
+
+## License
+
+This project is licensed under the GNU General Public License v3.0.
+
+It was developed for educational purposes as part of the ISOM5240 Individual Assignment.
+
 
 ## Notes
 
