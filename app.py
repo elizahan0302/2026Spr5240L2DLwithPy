@@ -2,12 +2,11 @@ import streamlit as st
 from PIL import Image
 from transformers import pipeline
 import random
-import numpy as np
 
 # Set up the Streamlit page.
 st.set_page_config(
-    page_title="Picture Story Magic",
-    page_icon="📖",
+    page_title="Text to Audio Story",
+    page_icon="📚",
     layout="wide"
 )
 
@@ -220,12 +219,12 @@ def load_captioning_model():
         model="Salesforce/blip-image-captioning-base"
     )
 
-# Load the female-style text-to-speech model.
+# Load the text-to-audio model.
 @st.cache_resource
 def load_audio_generator():
     return pipeline(
-        "text-to-speech",
-        model="kakao-enterprise/vits-ljs"
+        "text-to-audio",
+        model="Matthijs/mms-tts-eng"
     )
 
 # Open and check the uploaded image.
@@ -284,7 +283,7 @@ def generate_story_from_caption(caption):
     lesson = random.choice(lessons)
 
     story = (
-        f"{opening}, there was {caption}. "
+        f"{opening}, the picture showed {caption}. "
         f"It {feeling}. "
         f"It {action}. "
         "Along the way, a gentle friend came to help, and together they turned the moment into a magical adventure. "
@@ -301,30 +300,13 @@ def add_pauses_to_text(story):
     paused_story = paused_story.replace("? ", "? ... ")
     return paused_story
 
-# Add real silence between audio segments.
-def add_silence_to_audio(audio_array, sample_rate, pause_seconds=0.35):
-    audio_array = np.asarray(audio_array)
-
-    silence_length = int(sample_rate * pause_seconds)
-    silence = np.zeros(silence_length, dtype=audio_array.dtype)
-
-    if audio_array.ndim == 1:
-        audio_with_pause = np.concatenate([audio_array, silence])
-    else:
-        silence = np.zeros((silence_length, audio_array.shape[1]), dtype=audio_array.dtype)
-        audio_with_pause = np.concatenate([audio_array, silence], axis=0)
-
-    return audio_with_pause
-
-# Convert the story into audio with natural pauses.
+# Convert the story into audio.
 def generate_audio(story, audio_generator):
     story_with_pauses = add_pauses_to_text(story)
     speech_output = audio_generator(story_with_pauses)
 
     audio_array = speech_output["audio"]
     sample_rate = speech_output["sampling_rate"]
-
-    audio_array = add_silence_to_audio(audio_array, sample_rate)
 
     return audio_array, sample_rate
 
@@ -333,18 +315,18 @@ def main():
     st.markdown(
         """
         <div class="top-line">
-        🌈 📷 📖 ✨ 🔊
+        📚 📷 📖 ✨ 🔊
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.title("🌈 Picture Story Magic")
+    st.title("Turn Your Text into an Audio Story")
 
     st.markdown(
         """
         <div class="tip-box">
-        👋 Welcome to Picture Story Magic!<br>
+        👋 Welcome to the storytelling app!<br>
         Upload a picture, and the app will create a short story based on what it sees. 📷✨<br>
         You can also listen to the story with audio. 📖🔊
         </div>
@@ -376,7 +358,7 @@ def main():
 
     st.write("")
 
-    if st.button("✨ Create My Story! ✨"):
+    if st.button("✨ Generate Story and Audio ✨"):
         try:
             with st.spinner("Loading AI models... 🧠✨"):
                 captioning_model = load_captioning_model()
@@ -397,7 +379,7 @@ def main():
 
             st.write("")
 
-            with st.spinner("Creating a short story... 📖✨"):
+            with st.spinner("Generating a short story... 📖✨"):
                 story = generate_story_from_caption(caption)
 
             st.markdown("### 📖 Your Story")
@@ -418,12 +400,12 @@ def main():
             st.markdown("### 🔊 Listen to Your Story")
             st.audio(audio_array, sample_rate=sample_rate)
 
-            st.success("Your picture story is ready! 🌟")
+            st.success("Story and audio generated successfully! 🌟")
 
             st.markdown(
                 """
                 <div class="footer-line">
-                🌈 📷 ✨ 📖 🔊 ✨ 📷 🌈
+                📚 📷 ✨ 📖 🔊 ✨ 📷 📚
                 </div>
                 """,
                 unsafe_allow_html=True
