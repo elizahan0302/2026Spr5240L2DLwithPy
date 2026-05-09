@@ -7,7 +7,7 @@ import numpy as np
 
 # Set up the Streamlit page.
 st.set_page_config(
-    page_title="Text to Audio Story",
+    page_title="Picture to Audio Story",
     page_icon="🌟",
     layout="wide"
 )
