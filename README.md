@@ -1,4 +1,3 @@
-# 2026Spr5240L2DLwithPy
 # Turn Your Picture into an Audio Story
 
 ## Project Description
