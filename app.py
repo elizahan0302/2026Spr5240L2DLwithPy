@@ -1,11 +1,12 @@
 import streamlit as st
 from PIL import Image
 from transformers import pipeline
+import random
 
 # Set up the Streamlit page.
 st.set_page_config(
-    page_title="Little Garden Story Maker",
-    page_icon="🌸",
+    page_title="Puppy Picture Story",
+    page_icon="🐶",
     layout="wide"
 )
 
@@ -16,12 +17,12 @@ st.markdown(
     .stApp {
         background: linear-gradient(
             90deg,
-            #B8F2C2 0%,
-            #EFFFF4 10%,
-            #FFFDF2 25%,
-            #FFFDF2 75%,
-            #EFFFF4 90%,
-            #B8F2C2 100%
+            #FFF1F6 0%,
+            #FFF7FB 12%,
+            #FFFDF2 28%,
+            #FFFDF2 72%,
+            #FFF7FB 88%,
+            #FFF1F6 100%
         );
     }
 
@@ -29,7 +30,7 @@ st.markdown(
         max-width: 950px;
         padding-top: 2rem;
         padding-bottom: 3rem;
-        background-color: rgba(255, 255, 255, 0.82);
+        background-color: rgba(255, 255, 255, 0.88);
         border-radius: 30px;
         margin-top: 20px;
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
@@ -95,68 +96,56 @@ st.markdown(
         text-align: center;
     }
 
-    .garden-title {
-        text-align: center;
-        font-size: 32px;
-        margin-bottom: 10px;
+    .dog-left {
+        position: fixed;
+        left: 15px;
+        top: 120px;
+        width: 150px;
+        opacity: 0.95;
+        z-index: 1;
     }
 
-    .grass-left {
+    .dog-right {
         position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 140px;
-        height: 100%;
-        background: linear-gradient(to top, #7ED957, #B8F2C2);
-        opacity: 0.85;
-        z-index: -1;
-        border-right: 6px dashed #5DBB63;
+        right: 15px;
+        top: 120px;
+        width: 150px;
+        opacity: 0.95;
+        z-index: 1;
     }
 
-    .grass-right {
+    .paw-left {
         position: fixed;
-        right: 0;
-        bottom: 0;
-        width: 140px;
-        height: 100%;
-        background: linear-gradient(to top, #7ED957, #B8F2C2);
-        opacity: 0.85;
-        z-index: -1;
-        border-left: 6px dashed #5DBB63;
-    }
-
-    .flower-left {
-        position: fixed;
-        left: 18px;
-        bottom: 30px;
+        left: 45px;
+        bottom: 40px;
         font-size: 34px;
         line-height: 1.8;
         z-index: 1;
     }
 
-    .flower-right {
+    .paw-right {
         position: fixed;
-        right: 18px;
-        bottom: 30px;
+        right: 45px;
+        bottom: 40px;
         font-size: 34px;
         line-height: 1.8;
         z-index: 1;
     }
 
-    .top-flower-line {
+    .top-line {
         text-align: center;
-        font-size: 28px;
+        font-size: 30px;
         margin-bottom: 8px;
     }
 
-    .footer-garden {
+    .footer-line {
         text-align: center;
         font-size: 28px;
         margin-top: 25px;
     }
 
-    @media screen and (max-width: 900px) {
-        .grass-left, .grass-right, .flower-left, .flower-right {
+    @media screen and (max-width: 1000px) {
+        .dog-left, .dog-right, .paw-left, .paw-right {
             display: none;
         }
 
@@ -171,15 +160,54 @@ st.markdown(
     }
     </style>
 
-    <div class="grass-left"></div>
-    <div class="grass-right"></div>
-
-    <div class="flower-left">
-        🌸<br>🌷<br>🌼<br>🌸<br>🌱
+    <div class="dog-left">
+        <svg viewBox="0 0 200 200">
+            <path d="M55 95 C35 80, 35 45, 65 42 C75 20, 115 20, 125 42 C155 45, 160 80, 140 95" 
+                  fill="#FFF7E6" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M63 45 C48 50, 43 68, 50 85" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M125 45 C145 50, 150 70, 140 88" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="78" cy="78" r="6" fill="#333333"/>
+            <circle cx="118" cy="78" r="6" fill="#333333"/>
+            <path d="M93 95 Q100 102 107 95" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M100 88 L100 100" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="100" cy="88" r="6" fill="#333333"/>
+            <path d="M72 120 C65 150, 135 150, 128 120" fill="#FFF7E6" stroke="#333333" stroke-width="5"/>
+            <path d="M75 145 L70 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M125 145 L130 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M65 170 L78 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M122 170 L135 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M133 128 Q165 118 158 95" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <text x="50" y="195" font-size="22">woof!</text>
+        </svg>
     </div>
 
-    <div class="flower-right">
-        🌱<br>🌸<br>🌼<br>🌷<br>🌸
+    <div class="dog-right">
+        <svg viewBox="0 0 200 200">
+            <path d="M55 95 C35 80, 35 45, 65 42 C75 20, 115 20, 125 42 C155 45, 160 80, 140 95" 
+                  fill="#FFF7E6" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M63 45 C48 50, 43 68, 50 85" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M125 45 C145 50, 150 70, 140 88" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="78" cy="78" r="6" fill="#333333"/>
+            <circle cx="118" cy="78" r="6" fill="#333333"/>
+            <path d="M93 95 Q100 102 107 95" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M100 88 L100 100" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="100" cy="88" r="6" fill="#333333"/>
+            <path d="M72 120 C65 150, 135 150, 128 120" fill="#FFF7E6" stroke="#333333" stroke-width="5"/>
+            <path d="M75 145 L70 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M125 145 L130 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M65 170 L78 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M122 170 L135 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <path d="M67 128 Q35 118 42 95" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+            <text x="48" y="195" font-size="22">hello!</text>
+        </svg>
+    </div>
+
+    <div class="paw-left">
+        🐾<br>🐾<br>🐾
+    </div>
+
+    <div class="paw-right">
+        🐾<br>🐾<br>🐾
     </div>
     """,
     unsafe_allow_html=True
@@ -191,14 +219,6 @@ def load_captioning_model():
     return pipeline(
         "image-to-text",
         model="Salesforce/blip-image-captioning-base"
-    )
-
-# Load the story generation model.
-@st.cache_resource
-def load_story_generator():
-    return pipeline(
-        "text-generation",
-        model="pranavpsv/genre-story-generator-v2"
     )
 
 # Load the text-to-audio model.
@@ -223,84 +243,57 @@ def generate_caption(image, captioning_model):
     result = captioning_model(image)
 
     if result and isinstance(result, list):
-        return result[0].get("generated_text", "")
+        caption = result[0].get("generated_text", "").strip()
+        if caption:
+            return caption
 
-    return "a beautiful and magical picture"
+    return "a lovely picture"
 
-# Generate a complete child-friendly story from the caption.
-def generate_story(caption, story_generator):
-    prompt = (
-        "Write a complete cheerful children's story for kids aged 3 to 10. "
-        "The story must be between 50 and 90 words. "
-        "The story must have a clear beginning, middle, and happy ending. "
-        "Use simple, kind, and positive language. "
-        f"The story is based on this picture: {caption}. "
-        "Story:"
-    )
-
-    result = story_generator(
-        prompt,
-        max_new_tokens=140,
-        do_sample=True,
-        temperature=0.7,
-        top_p=0.9,
-        num_return_sequences=1
-    )
-
-    generated_text = result[0]["generated_text"]
-    story = generated_text.replace(prompt, "").strip()
-    story = clean_story(story)
-
-    if len(story.split()) < 50 or not story.endswith((".", "!", "?")):
-        story = create_backup_story(caption)
-
-    return story
-
-# Clean the generated story and stop it at the last complete sentence.
-def clean_story(story):
-    story = story.replace("\n", " ").strip()
-
-    ending_positions = [
-        story.rfind("."),
-        story.rfind("!"),
-        story.rfind("?")
+# Create a story that stays related to the image caption.
+def generate_story_from_caption(caption):
+    openings = [
+        "One sunny morning",
+        "On a bright and cheerful day",
+        "Once upon a time",
+        "One happy afternoon"
     ]
 
-    last_ending = max(ending_positions)
+    feelings = [
+        "felt curious and excited",
+        "was ready for a little adventure",
+        "wanted to explore the world",
+        "felt happy and brave"
+    ]
 
-    if last_ending != -1:
-        story = story[:last_ending + 1]
+    actions = [
+        "looked around carefully and found something special",
+        "took a small step forward and smiled",
+        "noticed a tiny surprise nearby",
+        "decided to share the happy moment with a friend"
+    ]
 
-    words = story.split()
+    lessons = [
+        "being kind makes every day brighter",
+        "small adventures can become wonderful memories",
+        "curiosity can lead to happy discoveries",
+        "sharing joy makes everyone smile"
+    ]
 
-    if len(words) > 100:
-        shortened_story = " ".join(words[:100])
+    opening = random.choice(openings)
+    feeling = random.choice(feelings)
+    action = random.choice(actions)
+    lesson = random.choice(lessons)
 
-        ending_positions = [
-            shortened_story.rfind("."),
-            shortened_story.rfind("!"),
-            shortened_story.rfind("?")
-        ]
-
-        last_ending = max(ending_positions)
-
-        if last_ending != -1:
-            story = shortened_story[:last_ending + 1]
-        else:
-            story = create_backup_story("a wonderful picture")
+    story = (
+        f"{opening}, there was {caption}. "
+        f"It {feeling}. "
+        f"It {action}. "
+        "Along the way, a gentle friend came to help, and together they turned the moment into a magical adventure. "
+        f"By the end of the day, everyone learned that {lesson}. "
+        "They went home smiling, feeling proud, safe, and happy."
+    )
 
     return story
-
-# Create a backup story if the model output is too short.
-def create_backup_story(caption):
-    return (
-        f"Once upon a time, there was {caption}. "
-        "It was a bright and happy day in a little garden. "
-        "A curious friend looked around and found something wonderful to explore. "
-        "With a big smile and a brave heart, the friend went on a small adventure. "
-        "Along the way, everyone learned to be kind, curious, and helpful. "
-        "At sunset, they all felt proud, safe, and happy."
-    )
 
 # Convert the story into audio.
 def generate_audio(story, audio_generator):
@@ -313,20 +306,20 @@ def generate_audio(story, audio_generator):
 def main():
     st.markdown(
         """
-        <div class="top-flower-line">
-        🌸 🌿 🌷 🌼 🌿 🌸
+        <div class="top-line">
+        🐶 🐾 📖 ✨ 🐾 🐶
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.title("🌸 Little Garden Story Maker")
+    st.title("🐶 Puppy Picture Story")
 
     st.markdown(
         """
         <div class="tip-box">
         👋 Hello, little storyteller!<br>
-        Upload a picture, and I will grow a magical story for you in our story garden. 📷🌱<br>
+        Upload a picture, and the puppy helper will make a story about your picture. 📷🐶<br>
         Then you can listen to your story too! 📖🔊
         </div>
         """,
@@ -336,12 +329,12 @@ def main():
     st.write("")
 
     uploaded_file = st.file_uploader(
-        "📷 Choose a picture to begin your garden story adventure!",
+        "📷 Choose a picture to begin your puppy story adventure!",
         type=["jpg", "jpeg", "png"]
     )
 
     if uploaded_file is None:
-        st.info("Please upload a picture first. A little story flower is waiting to bloom! 🌸")
+        st.info("Please upload a picture first. A puppy story is waiting for you! 🐶")
         return
 
     image = open_uploaded_image(uploaded_file)
@@ -357,11 +350,10 @@ def main():
 
     st.write("")
 
-    if st.button("✨ Grow My Story! ✨"):
+    if st.button("✨ Make My Puppy Story! ✨"):
         try:
-            with st.spinner("Loading the AI garden tools... 🧠🌱"):
+            with st.spinner("Loading the puppy helper tools... 🧠🐶"):
                 captioning_model = load_captioning_model()
-                story_generator = load_story_generator()
                 audio_generator = load_audio_generator()
 
             with st.spinner("Looking carefully at your picture... 👀📷"):
@@ -379,10 +371,10 @@ def main():
 
             st.write("")
 
-            with st.spinner("Growing a magical story for you... 📖🌸"):
-                story = generate_story(caption, story_generator)
+            with st.spinner("Writing a story about your picture... 📖✨"):
+                story = generate_story_from_caption(caption)
 
-            st.markdown("### 📖 Your Garden Story")
+            st.markdown("### 📖 Your Puppy Story")
             st.markdown(
                 f"""
                 <div class="story-box">
@@ -400,19 +392,19 @@ def main():
             st.markdown("### 🔊 Listen to Your Story")
             st.audio(audio_array, sample_rate=sample_rate)
 
-            st.success("Your story has bloomed! Great job, little storyteller! 🌟🌸")
+            st.success("Your puppy story is ready! Great job, little storyteller! 🌟🐶")
 
             st.markdown(
                 """
-                <div class="footer-garden">
-                🌱 🌸 🌼 🌷 🌿 🌷 🌼 🌸 🌱
+                <div class="footer-line">
+                🐾 🐶 🐾 📖 🐾 🐶 🐾
                 </div>
                 """,
                 unsafe_allow_html=True
             )
 
         except Exception as error:
-            st.error("Oh no! Something went wrong while growing the story. 😢")
+            st.error("Oh no! Something went wrong while making the story. 😢")
             st.warning("Please try another image or click the button again.")
 
             with st.expander("Show error details for debugging"):
