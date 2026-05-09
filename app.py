@@ -454,7 +454,7 @@ def main():
         unsafe_allow_html=True
     )
 
-    st.title("🌈 Turn Your Picture into an Audio Story")
+    st.title("Turn Your Picture into an Audio Story")
 
     st.markdown(
         """
