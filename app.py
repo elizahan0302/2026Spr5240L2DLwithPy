@@ -2,11 +2,12 @@ import streamlit as st
 from PIL import Image
 from transformers import pipeline
 import random
+import numpy as np
 
 # Set up the Streamlit page.
 st.set_page_config(
-    page_title="Puppy Picture Story",
-    page_icon="🐶",
+    page_title="Picture Story Magic",
+    page_icon="📖",
     layout="wide"
 )
 
@@ -177,7 +178,6 @@ st.markdown(
             <path d="M65 170 L78 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
             <path d="M122 170 L135 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
             <path d="M133 128 Q165 118 158 95" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <text x="50" y="195" font-size="22">woof!</text>
         </svg>
     </div>
 
@@ -198,7 +198,6 @@ st.markdown(
             <path d="M65 170 L78 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
             <path d="M122 170 L135 170" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
             <path d="M67 128 Q35 118 42 95" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
-            <text x="48" y="195" font-size="22">hello!</text>
         </svg>
     </div>
 
@@ -221,12 +220,12 @@ def load_captioning_model():
         model="Salesforce/blip-image-captioning-base"
     )
 
-# Load the text-to-audio model.
+# Load the female-style text-to-speech model.
 @st.cache_resource
 def load_audio_generator():
     return pipeline(
-        "text-to-audio",
-        model="Matthijs/mms-tts-eng"
+        "text-to-speech",
+        model="kakao-enterprise/vits-ljs"
     )
 
 # Open and check the uploaded image.
@@ -255,21 +254,21 @@ def generate_story_from_caption(caption):
         "One sunny morning",
         "On a bright and cheerful day",
         "Once upon a time",
-        "One happy afternoon"
+        "One peaceful afternoon"
     ]
 
     feelings = [
         "felt curious and excited",
-        "was ready for a little adventure",
-        "wanted to explore the world",
-        "felt happy and brave"
+        "was ready for a small adventure",
+        "wanted to explore the world nearby",
+        "felt happy, brave, and kind"
     ]
 
     actions = [
         "looked around carefully and found something special",
         "took a small step forward and smiled",
         "noticed a tiny surprise nearby",
-        "decided to share the happy moment with a friend"
+        "shared the happy moment with a new friend"
     ]
 
     lessons = [
@@ -295,11 +294,38 @@ def generate_story_from_caption(caption):
 
     return story
 
-# Convert the story into audio.
+# Add short pauses after sentence endings.
+def add_pauses_to_text(story):
+    paused_story = story.replace(". ", ". ... ")
+    paused_story = paused_story.replace("! ", "! ... ")
+    paused_story = paused_story.replace("? ", "? ... ")
+    return paused_story
+
+# Add real silence between audio segments.
+def add_silence_to_audio(audio_array, sample_rate, pause_seconds=0.35):
+    audio_array = np.asarray(audio_array)
+
+    silence_length = int(sample_rate * pause_seconds)
+    silence = np.zeros(silence_length, dtype=audio_array.dtype)
+
+    if audio_array.ndim == 1:
+        audio_with_pause = np.concatenate([audio_array, silence])
+    else:
+        silence = np.zeros((silence_length, audio_array.shape[1]), dtype=audio_array.dtype)
+        audio_with_pause = np.concatenate([audio_array, silence], axis=0)
+
+    return audio_with_pause
+
+# Convert the story into audio with natural pauses.
 def generate_audio(story, audio_generator):
-    speech_output = audio_generator(story)
+    story_with_pauses = add_pauses_to_text(story)
+    speech_output = audio_generator(story_with_pauses)
+
     audio_array = speech_output["audio"]
     sample_rate = speech_output["sampling_rate"]
+
+    audio_array = add_silence_to_audio(audio_array, sample_rate)
+
     return audio_array, sample_rate
 
 # Run the main Streamlit app.
@@ -307,20 +333,20 @@ def main():
     st.markdown(
         """
         <div class="top-line">
-        🐶 🐾 📖 ✨ 🐾 🐶
+        🌈 📷 📖 ✨ 🔊
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.title("🐶 Puppy Picture Story")
+    st.title("🌈 Picture Story Magic")
 
     st.markdown(
         """
         <div class="tip-box">
-        👋 Hello, little storyteller!<br>
-        Upload a picture, and the puppy helper will make a story about your picture. 📷🐶<br>
-        Then you can listen to your story too! 📖🔊
+        👋 Welcome to Picture Story Magic!<br>
+        Upload a picture, and the app will create a short story based on what it sees. 📷✨<br>
+        You can also listen to the story with audio. 📖🔊
         </div>
         """,
         unsafe_allow_html=True
@@ -329,12 +355,12 @@ def main():
     st.write("")
 
     uploaded_file = st.file_uploader(
-        "📷 Choose a picture to begin your puppy story adventure!",
+        "📷 Upload a picture for your story:",
         type=["jpg", "jpeg", "png"]
     )
 
     if uploaded_file is None:
-        st.info("Please upload a picture first. A puppy story is waiting for you! 🐶")
+        st.info("Please upload a picture first. Your story will appear here after the image is uploaded. ✨")
         return
 
     image = open_uploaded_image(uploaded_file)
@@ -344,22 +370,22 @@ def main():
 
     st.image(
         image,
-        caption="Your uploaded picture 🖼️",
+        caption="Uploaded picture 🖼️",
         use_container_width=True
     )
 
     st.write("")
 
-    if st.button("✨ Make My Puppy Story! ✨"):
+    if st.button("✨ Create My Story! ✨"):
         try:
-            with st.spinner("Loading the puppy helper tools... 🧠🐶"):
+            with st.spinner("Loading AI models... 🧠✨"):
                 captioning_model = load_captioning_model()
                 audio_generator = load_audio_generator()
 
-            with st.spinner("Looking carefully at your picture... 👀📷"):
+            with st.spinner("Reading the picture... 👀📷"):
                 caption = generate_caption(image, captioning_model)
 
-            st.markdown("### 🖼️ What I see in the picture")
+            st.markdown("### 🖼️ Image Description")
             st.markdown(
                 f"""
                 <div class="caption-box">
@@ -371,10 +397,10 @@ def main():
 
             st.write("")
 
-            with st.spinner("Writing a story about your picture... 📖✨"):
+            with st.spinner("Creating a short story... 📖✨"):
                 story = generate_story_from_caption(caption)
 
-            st.markdown("### 📖 Your Puppy Story")
+            st.markdown("### 📖 Your Story")
             st.markdown(
                 f"""
                 <div class="story-box">
@@ -386,25 +412,25 @@ def main():
 
             st.write("")
 
-            with st.spinner("Turning your story into audio... 🔊🎵"):
+            with st.spinner("Generating audio data... 🔊🎵"):
                 audio_array, sample_rate = generate_audio(story, audio_generator)
 
             st.markdown("### 🔊 Listen to Your Story")
             st.audio(audio_array, sample_rate=sample_rate)
 
-            st.success("Your puppy story is ready! Great job, little storyteller! 🌟🐶")
+            st.success("Your picture story is ready! 🌟")
 
             st.markdown(
                 """
                 <div class="footer-line">
-                🐾 🐶 🐾 📖 🐾 🐶 🐾
+                🌈 📷 ✨ 📖 🔊 ✨ 📷 🌈
                 </div>
                 """,
                 unsafe_allow_html=True
             )
 
         except Exception as error:
-            st.error("Oh no! Something went wrong while making the story. 😢")
+            st.error("Something went wrong while creating the story or audio. 😢")
             st.warning("Please try another image or click the button again.")
 
             with st.expander("Show error details for debugging"):
