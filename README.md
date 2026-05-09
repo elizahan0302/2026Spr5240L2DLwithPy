@@ -67,6 +67,7 @@ storytelling_app/
 ├── requirements.txt
 ├── README.md
 └── LICENSE
+```
 
 ### File Description
 
