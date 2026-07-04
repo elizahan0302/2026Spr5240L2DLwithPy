@@ -6,7 +6,6 @@ This is a Python-based storytelling application designed for children aged 3 to 
 Users can upload a picture, and the app will generate a short child-friendly story based on the image.  
 The story is also converted into audio so children can read and listen at the same time.
 
-This project was developed for the ISOM5240 Individual Assignment.
 
 ## Features
 
